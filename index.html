@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Giphy Homework</title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style>
+        
+* {
+    font-family: "Roboto", sans-serif;
+}
+
+.container {
+    margin: 0px!important;
+    min-width: 100vw;
+}
+
+#main-holder {}
+
+
+#l-sidebar {
+    background-color: #556468;
+    color: #FBF9FB;
+    height: 100vh;
+
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+#form-row {
+    margin-top: 3vh;
+    margin-bottom: 3vh;
+    height: 20vh;
+}
+
+#buttons-area {
+    height: 65vh;
+    overflow-y: scroll;
+    padding-bottom: 5px;
+}
+
+#logo-holder {
+    height: 15vh;
+    padding-top: 5px;
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+form {
+    border: 2px ridge #CECCCE;
+    padding: 1vw;
+    border-radius: 5px;
+}
+
+label {
+    font-size: 2.75vh;
+    text-align: center;
+}
+
+#custom-add-btn {
+    background-color: #8BB1B3;
+    color: #EDEBED;
+    width: 100%;
+}
+
+#custom-add-btn:hover {
+    background-color: #EDEBED;
+    color: #8BB1B3;
+}
+
+.float-right {
+    float: right;
+}
+
+#past-search-head {
+    text-align: center;
+    border: 1px double #CECCCE;
+    border-radius: 5px;
+    padding-bottom: 1vh;
+    padding-top: 1vh;
+}
+
+#generate-buttons {
+    margin: 0px;
+}
+
+.userInput-btn {
+    text-align: center;
+}
+
+.myNewbuttons {
+    font-size: 1.7vh!important;
+    background-color: #595859;
+    border: 1px solid #CECCCE!important;
+    margin-bottom: 1vh!important;
+}
+
+
+
+
+/*Gif Area - Right Side*/
+
+#main-sect {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding-left: 2vw;
+    padding-right: 2vw;
+}
+
+.myNewGifs {
+    width: 100%;
+    height: 19vh;
+}
+
+#gif-results {
+    width: 35vw;
+    text-align: center;
+    color: #465256;
+    border: 1px solid #595859;
+    border-radius: 5px;
+    padding: 2vh;
+    margin-bottom: 3vh;
+}
+
+.panel-body {
+    padding: 0px!important;
+}
+
+.panel-footer {
+    text-align: center;
+}
+
+@media only screen and (max-width: 980px) {
+    #l-sidebar {}
+    #form-row {
+
+        margin-top: 2vh;
+        margin-bottom: 0vh;
+        height: 15vh;
+    }
+    .myNewGifs {
+        width: 100%;
+        height: 13vh;
+    }
+    .custom-add-button {
+    	margin-bottom: 0.5vh;
+
+    }
+    #buttons-area {
+        height: 60vh;
+        overflow-y: scroll;
+        padding-bottom: 5px;
+    }
+    .myNewbuttons {
+    	font-size: 1.5vh!important;
+    }
+}
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row" id="#main-holder">
+            <div class="col-md-3 col-sm-4 col-xs-3" id="l-sidebar">
+                <div class="row" id="form-row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <form id=#custom-form>
+                            <div class="form-group">
+                                <label for="giphy-input" id="format-label-text" class="center-block">Search for a gif</label>
+                                <input type="text" class="form-control" id="giphy-input" placeholder="cats on bicycles">
+                            </div>
+                            <button type="submit" class="btn center-block" id="custom-add-btn">Search the Giphy Universe</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="row" id="buttons-area">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <h4 id="past-search-head">Past Searches</h4>
+                    </div>
+                    <div class="row" id="generate-buttons">
+                    </div>
+                </div>
+                <div cass="row" id="logo-holder">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <img class="img-responsive center-block" src="./giphy_logo.gif">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9 col-sm-8 col-xs-9" id="main-sect">
+                <div class="row">
+                    <h3 id="gif-results" class="center-block"></h3></div>
+                <div class="row" id="generate-gifs">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+        var myGiffy = {
+
+myArray: ["manchester city", "arsenal", "borussia dortmund", "anderlecht"],
+userInput: "",
+
+init: function() {
+
+    this.renderButtons();
+    this.clickHandler();
+    $("#gif-results").hide();
+},
+
+clickHandler: function() {
+
+    $("#custom-add-btn").on("click", function(event) {
+        event.preventDefault();
+        myGiffy.processUserInput();
+    })
+    $(document).on("click", ".myNewbuttons", function() {
+        var gifSelected = $(this).attr("data-name");
+        $("#gif-results").text("Here are your gifs of " + gifSelected + "!").show();
+        myGiffy.doApiStuff(gifSelected);
+    })
+    $(document).on("click", ".myNewGifs", function() {
+        var state = $(this).attr("data-state");
+        var gifClicked = this;
+        myGiffy.manipulateGifs(state, gifClicked);
+    })
+},
+
+processUserInput: function() {
+
+    userInput = $("#giphy-input").val().trim();
+    console.log(userInput);
+    myGiffy.myArray.push(userInput);
+    this.renderButtons();
+
+},
+renderButtons: function() {
+
+    $("#generate-buttons").empty();
+
+    for (var i = 0; i < this.myArray.length; i++) {
+        var colID = "colID"+i;
+        var col6 = $("<div class='col-md-6' id="+ colID + ">");
+        var a = $("<button class='btn '>");
+        a.addClass("myNewbuttons").attr("data-name", this.myArray[i]).text(this.myArray[i]);
+
+        $("#generate-buttons").prepend(col6);
+        $(col6).prepend(a);
+    }
+},
+
+renderGifs: function(data) {
+
+    $("#generate-gifs").empty();
+
+    for (var i = 0; i < 12; i++) {
+
+        var col3 = $("<div class='col-md-3 col-md-4 col-xs-6'><div class='panel panel-default' id='panelID" + i + "'><div class='panel-body'>");
+        var a = $("<img class='image-responsive center-block '>");
+        a.addClass("myNewGifs");
+        a.attr("data-still", data[i].images.downsized_still.url);
+        a.attr({
+            "src": data[i].images.downsized_still.url,
+            "data-still": data[i].images.downsized_still.url,
+            "data-animate": data[i].images.fixed_height_downsampled.url,
+            "data-state": "still"
+        });
+        var rating = "Rating " + data[i].rating;
+        var ratingText = $("<div class='panel-footer'>" + rating + "</div>")
+
+        $("#generate-gifs").append(col3);
+        $("#panelID" + i).append(a);
+        $("#panelID" + i).append(ratingText)
+    }
+},
+
+doApiStuff: function(gifSelected) {
+
+    $.ajax({
+        type: "GET",
+        url: "https://api.giphy.com/v1/gifs/search?q=" + gifSelected + "&api_key=31e54a1c80e6430b9761f0be77f2301f&limit=12"
+    }).done(function(response) {
+        console.log(response)
+        var writeGifs = response.data;
+        myGiffy.renderGifs(writeGifs);
+    })
+},
+
+manipulateGifs: function(state, gifClicked) {
+
+    if (state === "still") {
+        $(gifClicked).attr("src", $(gifClicked).attr("data-animate"));
+        $(gifClicked).attr("data-state", "animate");
+    } else {
+        $(gifClicked).attr("src", $(gifClicked).attr("data-still"));
+        $(gifClicked).attr("data-state", "still");
+    }
+}
+}
+$(document).ready(function() {
+myGiffy.init();
+})
+    </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</body>
